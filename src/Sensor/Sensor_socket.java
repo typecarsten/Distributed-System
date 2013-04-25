@@ -13,10 +13,10 @@ import javax.sound.sampled.Port;
 public class Sensor_socket {
 
 	private int port_number = 0;
-	private String hostname = "localhost";
+	private String hostname = "255.255.255.255";
 	private Socket serverSocket = null;
 	private DataOutputStream dataOut = null;
-	
+
 	public void publish(int data_type, double randomnum) {
 		// envent_type 1 = publish, 2 = subscribe
 		int event_type = 1;
@@ -52,7 +52,7 @@ public class Sensor_socket {
 		System.out.println(random_num);
 		return random_num;
 	}
-	
+
 	public void connect(Sensor_socket.connection_data_class cData) {
 		try {
 			serverSocket = new Socket(cData.getHostname(), cData.getPortNo());
@@ -76,14 +76,14 @@ public class Sensor_socket {
 
 	// Inner class with connection data
 	private class connection_data_class {
-		private String hostname = "localhost";
+		private String hostname = "255.255.255.255";
 		private int port_no = 1337;
 
 		/**
 		 * Will connect to predefined host.
 		 * 
 		 * @param hostname
-		 *            = "localhost"
+		 *            = "255.255.255.255"
 		 * @param port_no
 		 *            = 1337
 		 */
