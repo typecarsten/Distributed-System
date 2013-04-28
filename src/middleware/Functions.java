@@ -9,6 +9,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Random;
@@ -27,6 +28,8 @@ public class Functions {
 		try {
 			dataSocket = new DatagramSocket();
 			dataSocket.setBroadcast(true);
+			//timeout set to 5 sec
+			dataSocket.setSoTimeout(5000);
 		} catch (SocketException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -47,6 +50,7 @@ public class Functions {
 
 		sendData = sendString.getBytes();
 		sendPacket.setData(sendData);
+		
 		try {
 			dataSocket.send(sendPacket);
 		} catch (IOException e1) {
@@ -55,12 +59,12 @@ public class Functions {
 		}
 		receiveData = new byte[100];
 		receivePacket = new DatagramPacket(receiveData, receiveData.length);
-		try {
-			dataSocket.receive(receivePacket);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			try {
+				dataSocket.receive(receivePacket);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		InputStreamReader receive = new InputStreamReader(
 				new ByteArrayInputStream(receivePacket.getData()),
 				Charset.forName("UTF-8"));
@@ -79,6 +83,13 @@ public class Functions {
 			serverIp = receivePacket.getAddress();
 			dataSocket.close();
 			return true;
+		}else {
+			try {
+				dataSocket.send(sendPacket);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		dataSocket.close();
 		return false;
