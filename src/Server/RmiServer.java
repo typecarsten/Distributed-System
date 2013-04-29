@@ -1,21 +1,27 @@
 package Server;
+import java.net.SocketTimeoutException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.RMISecurityManager;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.*; 
+
+import middleware.Functions;
  
 public class RmiServer extends UnicastRemoteObject 
     implements RmiServerIntf, Runnable {
-	Server_socket_program socket;
-	private double avg_temp = 2;
+	private double avg_temp = 0;
+	Functions func = null;
+	private int count = 0;
+	private double temp_all = 0;
+	CalculateAvgTemp cal= null;
  
-	public RmiServer(Server_socket_program server_socket) throws RemoteException {
-		this.socket = server_socket;
+	public RmiServer(CalculateAvgTemp cal) throws RemoteException {
+		this.cal = cal;
 	}
  
     public double Status() {
-        return socket.avg_temp;
+        return cal.getAvg_temp();
     }
 
 	@Override
@@ -40,7 +46,7 @@ public class RmiServer extends UnicastRemoteObject
  
         try {
             //Instantiate RmiServer
-            RmiServer obj = new RmiServer(socket);
+            RmiServer obj = new RmiServer(cal);
  
             // Bind this object instance to the name "RmiServer"
             Naming.rebind("//localhost/RmiServer", obj);

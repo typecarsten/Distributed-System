@@ -9,11 +9,11 @@ public class Server_main {
 	 * @throws RemoteException 
 	 */
 	public static void main(String[] args) throws RemoteException {
-		Server_socket_program socket = new Server_socket_program();
-		Thread socket_thread = new Thread(socket);
-//		Thread RMI = new Thread(new RmiServer(socket));
-//		RMI.run();
-		socket.run();
+		CalculateAvgTemp cal = new CalculateAvgTemp();
+		Thread calThread = new Thread(cal);
+		Thread RMI = new Thread(new RmiServer(cal));
+		RMI.start();
+		calThread.start();
 	}
 
 }

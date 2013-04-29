@@ -1,5 +1,7 @@
 package Publishers;
 
+import java.net.SocketTimeoutException;
+
 import middleware.Functions;
 
 public class TempSensor {
@@ -9,9 +11,18 @@ public class TempSensor {
 	 */
 	public static void main(String[] args) {
 		Functions func = new Functions();
-		if(func.findServer()){
-			func.publish(1, func.generate_temp());
-		}		
+		run(func);
+	}
+
+	private static void run(Functions func) {
+		try {
+			if(func.findServer()){
+				func.publish(1, func.generate_temp());
+			}
+		} catch (SocketTimeoutException e) {
+			run(func);
+			e.printStackTrace();
+		}
 	}
 
 }

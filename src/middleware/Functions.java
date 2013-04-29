@@ -21,15 +21,12 @@ public class Functions {
 	private InetAddress serverIp;
 	private DataOutputStream dataOut = null;
 	private Socket serverSocket;
-	private final int SUBSCRIBERPORT = 1347;
 
-	public boolean findServer() {
+	public boolean findServer() throws SocketTimeoutException {
 		DatagramSocket dataSocket = null;
 		try {
 			dataSocket = new DatagramSocket();
 			dataSocket.setBroadcast(true);
-			//timeout set to 5 sec
-			dataSocket.setSoTimeout(5000);
 		} catch (SocketException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -136,23 +133,23 @@ public class Functions {
 		}
 	}
 
-	public void subscribe() {
+	public void subscribe(int data_type, int replyPort) {
 		dataOut = connect(PORT);
 		try {
-			dataOut.writeBytes("Subscribe");
+			dataOut.writeBytes("Subscribe" + ";" + data_type + ";" + replyPort);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		closeConnection();
 	}
 
-	public void subscribtionReceive() {
+	public StringBuilder subscribtionReceive(int replyPort) {
 		byte[] receiveData = new byte[100];
 		DatagramPacket receivePacket = new DatagramPacket(receiveData,
 				receiveData.length);
 		DatagramSocket subscribeSocket = null;
 		try {
-			subscribeSocket = new DatagramSocket(SUBSCRIBERPORT);
+			subscribeSocket = new DatagramSocket(replyPort);
 		} catch (SocketException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -176,11 +173,7 @@ public class Functions {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String[] string = receivedString.toString().split(";");
-		int data_type = Integer.parseInt(string[0]);
-		double value = Double.parseDouble(string[1]);
-		System.out.println(data_type);
-		System.out.println(value);
+		return receivedString;
 	}
 
 	public int generate_temp() {

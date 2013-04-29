@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -13,9 +12,8 @@ import java.util.List;
 
 
 public class Middleware implements Runnable {
-	private List<InetAddress> SubscriberList = new ArrayList<>();;
+	private List<SubscribeDataClass> SubscriberList = new ArrayList<>();;
 	private final int PORT = 1337;
-	private final int SUBSCRIBERPORT = 1347;
 	private ServerSocket serverSocket = null;
 	private Socket clientSocket = null;
 	private String inputLine;
@@ -45,7 +43,6 @@ public class Middleware implements Runnable {
 	public void read_input() {
 		try {
 				if ((inputLine = in.readLine()) != null) {
-					System.out.println(inputLine);
 					String[] arguments = inputLine.split(";");
 					if (arguments[0].equalsIgnoreCase("Publish")) {
 						System.out.println("Publish modtaget");
@@ -57,24 +54,30 @@ public class Middleware implements Runnable {
 						transmitPublish = pubmsg.getBytes();
 						DatagramPacket publishPacket = new DatagramPacket(
 								transmitPublish, transmitPublish.length);
-						if (SubscriberList != null) {
-							System.out.println(SubscriberList);
-							for (InetAddress clientIp : SubscriberList) {
-								System.out.println(clientIp);
-								publishPacket.setAddress(clientIp);
-								publishPacket.setPort(SUBSCRIBERPORT);
-								publishSocket.send(publishPacket);
+						if (SubscriberList.size() > 0) {
+							for (SubscribeDataClass subscriber : SubscriberList) {
+								publishPacket.setAddress(subscriber.getServerIp());
+								publishPacket.setPort(subscriber.getPort());
+								if (subscriber.getData_type() == data_type) {
+									publishSocket.send(publishPacket);
+								}
 							}
 						}
 					}
 					if (arguments[0].equalsIgnoreCase("Subscribe")) {
-						InetAddress clientAddress = clientSocket
-								.getInetAddress();
-						SubscriberList.add(clientAddress);
-						System.out.println(SubscriberList);
+						int data_type = Integer.parseInt(arguments[1]);
+						int port = Integer.parseInt(arguments[2]);
+						SubscribeDataClass subscriber = new SubscribeDataClass(clientSocket.getInetAddress(), port, data_type);
+						SubscriberList.add(subscriber);
 					}
 				}
 		} catch (NumberFormatException | IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			clientSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

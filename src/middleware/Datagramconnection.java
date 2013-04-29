@@ -64,7 +64,6 @@ public class Datagramconnection implements Runnable {
 				e.printStackTrace();
 			}
 		}
-		System.out.println(receivedString);
 		}
 	}
 
